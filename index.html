@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>からだログ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  color-scheme: light;
+  --bg:#f3f5f1; --surface:#fbfcfa; --ink:#18201b; --ink-2:#4f5a53; --muted:#7b857e;
+  --line:#dde2dc; --grid:#e8ece6;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a;
+  --accent:#256abf; --tag:#e7eee6;
+  --good:#0ca30c; --warn:#fab219;
+  --c1:#2a78d6; --c2:#eb6834; --c3:#1baf7a; --c4:#eda100; --c5:#e87ba4; --c6:#008300;
+  --h-lo:#b7d3f6; --h-lo-ink:#104281; --h-ok:#eceeea; --h-hi:#f5c0bf; --h-hi-ink:#8a1f1e;
+  --ref:#6b746d; --in:#1baf7a; --out:#eb6834;
+  --g-ok:#cfeccf; --g-ok-ink:#0f5c0f; --g-mid:#fbe7b5; --g-mid-ink:#6b4a00; --g-ng:#f5c0bf; --g-ng-ink:#8a1f1e;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --bg:#121614; --surface:#1a1f1c; --ink:#eef2ed; --ink-2:#c1c9c2; --muted:#8d978f;
+    --line:#2d3530; --grid:#262d29; --s1:#3987e5; --s2:#d95926; --s3:#199e70; --accent:#6da7ec; --tag:#242b27;
+    --c1:#3987e5; --c2:#d95926; --c3:#199e70; --c4:#c98500; --c5:#d55181; --c6:#008300;
+    --h-lo:#184f95; --h-lo-ink:#dbe9fb; --h-ok:#2a302c; --h-hi:#7c2524; --h-hi-ink:#fbdede; --ref:#a3aca5; --in:#199e70; --out:#d95926; --g-ok:#1f4a24; --g-ok-ink:#d4f5d4; --g-mid:#5a4712; --g-mid-ink:#fbeac0; --g-ng:#7c2524; --g-ng-ink:#fbdede;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#121614; --surface:#1a1f1c; --ink:#eef2ed; --ink-2:#c1c9c2; --muted:#8d978f;
+  --line:#2d3530; --grid:#262d29; --s1:#3987e5; --s2:#d95926; --s3:#199e70; --accent:#6da7ec; --tag:#242b27;
+  --c1:#3987e5; --c2:#d95926; --c3:#199e70; --c4:#c98500; --c5:#d55181; --c6:#008300;
+  --h-lo:#184f95; --h-lo-ink:#dbe9fb; --h-ok:#2a302c; --h-hi:#7c2524; --h-hi-ink:#fbdede; --ref:#a3aca5; --in:#199e70; --out:#d95926; --g-ok:#1f4a24; --g-ok-ink:#d4f5d4; --g-mid:#5a4712; --g-mid-ink:#fbeac0; --g-ng:#7c2524; --g-ng-ink:#fbdede;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.7 "BIZ UDPGothic","Hiragino Sans","Noto Sans JP",system-ui,sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:16px;padding-block:28px 56px;display:grid;gap:28px}
+header{display:grid;gap:6px}
+header h1{font-size:26px;line-height:1.3;margin:0;letter-spacing:.02em;text-wrap:balance}
+.meta{color:var(--ink-2);font-size:13px;display:flex;flex-wrap:wrap;gap:6px 16px}
+.pill{display:inline-block;background:var(--tag);color:var(--ink-2);border-radius:999px;padding:1px 10px;font-size:12px}
+.num{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:grid;gap:2px}
+.tile .k{font-size:12px;color:var(--ink-2);letter-spacing:.04em}
+.tile .v{font-size:24px;line-height:1.25}
+.tile .s{font-size:12px;color:var(--muted)}
+section{display:grid;gap:12px}
+section>h2{font-size:17px;margin:0;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+section>h2 small{font-weight:400;font-size:12px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px 8px;display:grid;gap:4px;min-width:0;align-content:start}
+.card h3{font-size:14px;margin:0}
+.card .sub{font-size:12px;color:var(--muted);margin:0}
+.legend{display:flex;gap:12px;font-size:12px;color:var(--ink-2);flex-wrap:wrap}
+.legend i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:5px}
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart text.reflab{fill:var(--ref);font-size:10.5px;font-family:inherit;paint-order:stroke;stroke:var(--surface);stroke-width:4px;stroke-linejoin:round}
+.chart text{fill:var(--muted);font-size:11px;font-family:"IBM Plex Mono",ui-monospace,monospace}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12px;line-height:1.5;padding:6px 9px;border-radius:6px;white-space:nowrap;transform:translate(-50%,-100%);top:0}
+.empty{font-size:13px;color:var(--muted);padding:18px 0 14px}
+.notes{display:grid;gap:8px}
+.note{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:14px}
+.note b{font-family:"IBM Plex Mono",monospace;font-weight:500;color:var(--ink-2);margin-right:8px}
+details{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+summary{cursor:pointer;font-size:14px}
+summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tbl{overflow-x:auto;margin-top:8px}
+table{border-collapse:collapse;font-size:12px}
+th,td{padding:4px 8px;border-bottom:1px solid var(--grid);text-align:right;white-space:nowrap}
+th{color:var(--ink-2);font-weight:700;position:sticky;top:0;background:var(--surface)}
+td:first-child,th:first-child{text-align:left}
+.bars{display:grid;gap:6px}
+.bar{display:grid;grid-template-columns:minmax(90px,30%) 1fr auto;gap:8px;align-items:center;font-size:13px}
+.bar span.b{height:10px;border-radius:0 4px 4px 0;background:var(--s1)}
+.grid.dense{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.legend i.sq{width:10px;height:10px;border-radius:2px}
+.tip i.sw{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}
+table.heat td{text-align:center;font-size:11px;padding:5px 6px;border:2px solid var(--surface);border-radius:4px}
+table.heat th{text-align:left}
+table.heat thead th{text-align:center}
+table.heat td.lo{background:var(--h-lo);color:var(--h-lo-ink)}
+table.heat td.ok{background:var(--h-ok);color:var(--ink-2)}
+table.heat td.hi{background:var(--h-hi);color:var(--h-hi-ink)}
+table.heat td.gok{background:var(--g-ok);color:var(--g-ok-ink)}
+table.heat td.gmid{background:var(--g-mid);color:var(--g-mid-ink)}
+table.heat td.gng{background:var(--g-ng);color:var(--g-ng-ink)}
+table.heat td.gna{color:var(--muted)}
+.guide-note{font-size:12px;color:var(--muted);margin:8px 0 0;display:grid;gap:2px}
+.meals{display:grid;gap:10px;margin-top:8px}
+.meal .mh{display:flex;justify-content:space-between;font-weight:700;font-size:13px;border-bottom:1px solid var(--grid);padding-bottom:2px}
+.meal ul{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:4px}
+.meal li{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:baseline;font-size:13px}
+.meal li .it{min-width:0;overflow-wrap:anywhere}
+.chip{font-size:10.5px;padding:0 7px;border-radius:999px;border:1px solid var(--cc);color:var(--ink-2);white-space:nowrap}
+.chip::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--cc);margin-right:4px;vertical-align:1px}
+details summary b{margin-right:6px}
+.x .wrap{max-width:none;width:1080px;padding-inline:36px;padding-block:32px 28px;gap:22px}
+.x body,.x{font-size:17px}
+.x header h1{font-size:34px}
+.x .grid{grid-template-columns:repeat(2,1fr);gap:16px}
+.x .tiles{grid-template-columns:repeat(4,1fr)}
+.x .tile .v{font-size:30px}
+.x .tile .k,.x .tile .s{font-size:14px}
+.x .grid.dense{grid-template-columns:repeat(3,1fr)}
+.x .card h3{font-size:18px}
+.x .card .sub,.x .legend{font-size:14px}
+.x .chart text{font-size:13px}
+.x section>h2{font-size:22px}
+.x table.heat{width:100%}
+.x #sec-time .grid{grid-template-columns:1fr}
+.x #sec-indicators .grid{grid-template-columns:repeat(3,1fr)}
+.x .guide-note{font-size:14px}
+.x table.heat td{font-size:14px;padding:7px 10px}
+.x table.heat th{font-size:14px}
+.foot{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+const DATA={"mode": "share", "full": true, "generated": "2026-09-27 08:29", "daily": [{"date": "2026-09-19", "bmi_pm": 27.5, "bmr_pm": 1589.0, "bodyfat_pm": 29.4, "fat_mass_pm": 21.0, "muscle_mass_pm": 20.7, "muscle_pct_pm": 29.0, "visceral_fat_pm": 12.5, "weight_pm": 71.4, "log_streak": 0, "height_cm": 161.1}, {"date": "2026-09-20", "bedtime": 23.333333333333332, "calcium_mg": 568.0, "carb_g": 133.3, "fat_g": 38.4, "fiber_g": 8.1, "foodcat:パン・菓子": 317.0, "foodcat:プロテインバー": 188.0, "foodcat:飲料・汁物・その他": 145.0, "foodcat:麺類": 365.0, "grip_L_am": 28.1, "grip_L_pm": 24.5, "grip_R_am": 27.6, "grip_R_pm": 26.5, "intake_kcal": 1015.0, "iron_mg": 4.4, "mealkcal:夕食": 818.0, "mealkcal:昼食": 52.0, "mealkcal:間食": 145.0, "mealprot:夕食": 30.0, "mealprot:昼食": 1.1, "out_of_bed": "06:50", "protein_g": 33.6, "salt_g": 8.3, "satfat_g": 13.13, "toggl:休憩": 3.442, "toggl:研究": 1.619, "toggl:雑務(音楽を聞きながらの作業)": 0.665, "vitA_ug": 56.0, "vitB1_mg": 0.43, "vitB2_mg": 0.79, "vitC_mg": 2.0, "vitE_mg": 4.2, "waist_am": 87.6, "waist_pm": 90.2, "wake_final": "05:00", "wake_first": "05:00", "bmi_am": 27.0, "bmr_am": 1566.0, "bodyfat_am": 29.9, "fat_mass_am": 21.0, "muscle_mass_am": 20.3, "muscle_pct_am": 28.9, "visceral_fat_am": 12.0, "weight_am": 70.1, "meal_dinner": "18:05", "bmi_pm": 27.1, "bmr_pm": 1572.0, "bodyfat_pm": 29.0, "fat_mass_pm": 20.4, "muscle_mass_pm": 20.5, "muscle_pct_pm": 29.2, "visceral_fat_pm": 12.0, "weight_pm": 70.2, "wake_h": 5.0, "first_meal_h": 18.08, "last_meal_h": 18.08, "meals_n": 1, "grip_mean_am": 27.85, "grip_mean_pm": 25.5, "pfc_p_pct": 13.3, "pfc_f_pct": 34.1, "pfc_c_pct": 52.6, "protein_g_per_kg": 0.48, "log_streak": 1, "ffm_am": 49.1, "whtr": 0.544, "grip_rel": 0.397, "meal_to_bed_h": 5.25, "protein_meals_ok": 1, "protein_meals_n": 2, "height_cm": 161.1, "guide_carb": "○"}, {"date": "2026-09-21", "bedtime": 24.0, "calcium_mg": 645.0, "carb_g": 336.6, "fat_g": 81.9, "fiber_g": 19.2, "foodcat:ご飯もの": 452.0, "foodcat:パン・菓子": 896.0, "foodcat:プロテインバー": 376.0, "foodcat:飲料・汁物・その他": 0.0, "foodcat:麺類": 637.0, "grip_L_am": 27.7, "grip_L_pm": 28.0, "grip_R_am": 29.7, "grip_R_pm": 28.7, "intake_kcal": 2361.0, "iron_mg": 8.2, "mealkcal:夕食": 760.0, "mealkcal:昼食": 825.0, "mealkcal:朝食": 776.0, "mealprot:夕食": 28.2, "mealprot:昼食": 16.3, "mealprot:朝食": 29.1, "protein_g": 73.6, "salt_g": 21.8, "satfat_g": 23.64, "toggl:休憩": 6.839, "toggl:研究": 2.789, "toggl:雑務(音楽を聞きながらの作業)": 0.519, "vitA_ug": 120.0, "vitB1_mg": 0.9, "vitB2_mg": 0.89, "vitC_mg": 9.0, "vitE_mg": 11.4, "waist_am": 88.9, "waist_pm": 89.4, "wake_final": "08:02", "wake_first": "08:02", "bmi_am": 26.9, "bmr_am": 1559.0, "bodyfat_am": 29.6, "fat_mass_am": 20.6, "muscle_mass_am": 20.2, "muscle_pct_am": 29.0, "visceral_fat_am": 12.0, "weight_am": 69.6, "meal_breakfast": "08:09", "meal_dinner": "20:21", "bmi_pm": 27.2, "bmr_pm": 1577.0, "bodyfat_pm": 29.1, "fat_mass_pm": 20.5, "muscle_mass_pm": 20.5, "muscle_pct_pm": 29.1, "visceral_fat_pm": 12.0, "weight_pm": 70.6, "sleep_h": 8.7, "wake_h": 8.03, "midsleep_h": 3.68, "first_meal_h": 8.15, "last_meal_h": 20.35, "meals_n": 2, "eating_window_h": 12.2, "grip_mean_am": 28.7, "grip_mean_pm": 28.35, "pfc_p_pct": 12.4, "pfc_f_pct": 31.0, "pfc_c_pct": 56.6, "protein_g_per_kg": 1.06, "log_streak": 2, "ffm_am": 49.0, "whtr": 0.552, "grip_rel": 0.412, "meal_to_bed_h": 3.65, "protein_meals_ok": 2, "protein_meals_n": 3, "height_cm": 161.1, "guide_sleep": "○", "guide_carb": "○"}, {"date": "2026-09-22", "active_kcal": 170.0, "bedtime": 25.0, "brisk_steps": 1716.0, "calcium_mg": 690.0, "carb_g": 235.9, "fat_g": 63.3, "fiber_g": 18.4, "foodcat:パン・菓子": 527.0, "foodcat:プロテインバー": 376.0, "foodcat:飲料・汁物・その他": 0.0, "foodcat:麺類": 794.0, "grip_L_am": 26.8, "grip_L_pm": 27.8, "grip_R_am": 27.1, "grip_R_pm": 27.4, "intake_kcal": 1697.0, "iron_mg": 8.2, "mealkcal:夕食": 828.0, "mealkcal:昼食": 869.0, "mealprot:夕食": 28.1, "mealprot:昼食": 33.3, "omron_total_kcal": 1993.0, "protein_g": 61.4, "salt_g": 16.6, "satfat_g": 16.24, "steps": 2128.0, "toggl:休憩": 7.528, "toggl:研究": 2.938, "toggl:雑務(音楽を聞きながらの作業)": 0.704, "vitA_ug": 1134.0, "vitB1_mg": 2.46, "vitB2_mg": 1.98, "vitC_mg": 182.0, "vitE_mg": 16.5, "waist_am": 87.9, "waist_pm": 88.1, "wake_final": "07:02", "wake_first": "07:02", "bmi_am": 27.0, "bmr_am": 1563.0, "bodyfat_am": 29.8, "fat_mass_am": 20.8, "muscle_mass_am": 20.2, "muscle_pct_am": 28.9, "visceral_fat_am": 12.0, "weight_am": 69.9, "meal_lunch": "10:38", "meal_dinner": "17:58", "bmi_pm": 27.1, "bmr_pm": 1579.0, "bodyfat_pm": 27.8, "fat_mass_pm": 19.5, "muscle_mass_pm": 20.7, "muscle_pct_pm": 29.5, "visceral_fat_pm": 12.0, "weight_pm": 70.3, "sleep_h": 7.03, "wake_h": 7.03, "midsleep_h": 3.52, "first_meal_h": 10.63, "last_meal_h": 17.97, "meals_n": 2, "eating_window_h": 7.33, "grip_mean_am": 26.95, "grip_mean_pm": 27.6, "pfc_p_pct": 14.0, "pfc_f_pct": 32.4, "pfc_c_pct": 53.6, "protein_g_per_kg": 0.88, "bmr_used": 1563, "tef_kcal": 170, "tee_calc": 1903, "energy_balance": -206, "weight_am_7d": 69.87, "bodyfat_am_7d": 29.77, "muscle_mass_am_7d": 20.23, "waist_am_7d": 88.13, "grip_mean_am_7d": 27.83, "grip_mean_pm_7d": 27.15, "intake_kcal_7d": 1691.0, "protein_g_7d": 56.2, "weight_am_chg": 0.0, "waist_am_chg": 0.0, "muscle_mass_am_chg": 0.0, "grip_mean_am_chg": 0.0, "log_streak": 3, "ffm_am": 49.1, "whtr": 0.546, "grip_rel": 0.386, "deficit_pct": 10.8, "meal_to_bed_h": 7.03, "protein_meals_ok": 2, "protein_meals_n": 2, "fat_mass_am_7d": 20.8, "ffm_am_7d": 49.07, "height_cm": 161.1, "guide_sleep": "○", "guide_carb": "○", "guide_deficit": "○", "guide_steps": "×"}, {"date": "2026-09-23", "active_kcal": 317.0, "bedtime": 24.0, "brisk_steps": 3337.0, "calcium_mg": 328.0, "carb_g": 218.4, "fat_g": 76.7, "fiber_g": 12.5, "foodcat:ご飯もの": 466.0, "foodcat:パン・菓子": 488.0, "foodcat:肉・魚・乳製品": 265.0, "foodcat:麺類": 588.0, "grip_L_am": 28.0, "grip_L_pm": 24.1, "grip_R_am": 26.0, "grip_R_pm": 24.5, "intake_kcal": 1807.0, "iron_mg": 5.6, "mealkcal:夕食": 773.0, "mealkcal:昼食": 1034.0, "mealprot:夕食": 37.5, "mealprot:昼食": 29.8, "omron_total_kcal": 2141.0, "protein_g": 67.3, "salt_g": 12.5, "satfat_g": 19.13, "steps": 4173.0, "toggl:休憩": 2.067, "toggl:研究": 2.618, "toggl:雑務(音楽を聞きながらの作業)": 2.581, "vitA_ug": 277.0, "vitB1_mg": 0.4, "vitB2_mg": 0.88, "vitC_mg": 13.0, "vitE_mg": 7.2, "waist_am": 90.2, "waist_pm": 90.9, "wake_final": "06:50", "wake_first": "06:50", "bmi_am": 27.0, "bmr_am": 1564.0, "bodyfat_am": 29.7, "fat_mass_am": 20.8, "muscle_mass_am": 20.2, "muscle_pct_am": 28.9, "visceral_fat_am": 12.0, "weight_am": 69.9, "nap_min": 90, "meal_lunch": "13:00", "meal_dinner": "21:07", "bmi_pm": 27.2, "bmr_pm": 1587.0, "bodyfat_pm": 27.1, "fat_mass_pm": 19.1, "muscle_mass_pm": 21.0, "muscle_pct_pm": 29.8, "visceral_fat_pm": 12.0, "weight_pm": 70.6, "sleep_h": 5.83, "wake_h": 6.83, "midsleep_h": 3.92, "first_meal_h": 13.0, "last_meal_h": 21.12, "meals_n": 2, "eating_window_h": 8.12, "grip_mean_am": 27.0, "grip_mean_pm": 24.3, "pfc_p_pct": 14.7, "pfc_f_pct": 37.7, "pfc_c_pct": 47.7, "protein_g_per_kg": 0.96, "bmr_used": 1564, "tef_kcal": 181, "tee_calc": 2062, "energy_balance": -255, "weight_am_7d": 69.88, "bodyfat_am_7d": 29.75, "muscle_mass_am_7d": 20.23, "waist_am_7d": 88.65, "grip_mean_am_7d": 27.62, "grip_mean_pm_7d": 26.44, "sleep_h_7d": 7.19, "intake_kcal_7d": 1720.0, "protein_g_7d": 58.97, "weight_am_chg": 0.01, "waist_am_chg": 0.52, "muscle_mass_am_chg": 0.0, "grip_mean_am_chg": -0.21, "midsleep_sd_min": 12.1, "log_streak": 4, "ffm_am": 49.1, "whtr": 0.56, "grip_rel": 0.386, "deficit_pct": 12.4, "meal_to_bed_h": 2.88, "protein_meals_ok": 2, "protein_meals_n": 2, "fat_mass_am_7d": 20.8, "ffm_am_7d": 49.08, "height_cm": 161.1, "guide_sleep": "×", "guide_carb": "○", "guide_deficit": "○", "guide_steps": "○"}, {"date": "2026-09-24", "active_kcal": 486.0, "bedtime": 24.0, "brisk_steps": 5793.0, "calcium_mg": 501.0, "carb_g": 201.3, "fat_g": 56.3, "fiber_g": 23.5, "foodcat:プロテインバー": 348.0, "foodcat:飲料・汁物・その他": 0.0, "foodcat:麺類": 1150.0, "grip_L_am": 26.6, "grip_L_pm": 28.6, "grip_R_am": 26.8, "grip_R_pm": 27.3, "intake_kcal": 1498.0, "iron_mg": 6.5, "mealkcal:夕食": 537.0, "mealkcal:昼食": 429.0, "mealkcal:朝食": 532.0, "mealprot:夕食": 22.3, "mealprot:昼食": 17.5, "mealprot:朝食": 23.2, "omron_total_kcal": 2333.0, "protein_g": 63.0, "salt_g": 15.0, "satfat_g": 18.96, "steps": 7396.0, "toggl:休憩": 5.716, "toggl:研究": 2.755, "toggl:雑務(音楽を聞きながらの作業)": 3.266, "vitA_ug": 16.0, "vitB1_mg": 1.02, "vitB2_mg": 1.24, "vitC_mg": 2.0, "vitE_mg": 6.1, "waist_am": 89.4, "waist_pm": 88.6, "wake_final": "07:12", "wake_first": "07:12", "bmi_am": 27.0, "bmr_am": 1564.0, "bodyfat_am": 30.4, "fat_mass_am": 21.3, "muscle_mass_am": 20.1, "muscle_pct_am": 28.7, "visceral_fat_am": 12.0, "weight_am": 70.1, "meal_breakfast": "09:00", "meal_lunch": "12:59", "meal_dinner": "17:36", "bmi_pm": 27.2, "bmr_pm": 1584.0, "bodyfat_pm": 27.6, "fat_mass_pm": 19.5, "muscle_mass_pm": 20.9, "muscle_pct_pm": 29.6, "visceral_fat_pm": 12.0, "weight_pm": 70.6, "sleep_h": 7.2, "wake_h": 7.2, "midsleep_h": 3.6, "first_meal_h": 9.0, "last_meal_h": 17.6, "meals_n": 3, "eating_window_h": 8.6, "grip_mean_am": 26.7, "grip_mean_pm": 27.95, "pfc_p_pct": 16.1, "pfc_f_pct": 32.4, "pfc_c_pct": 51.5, "protein_g_per_kg": 0.9, "bmr_used": 1564, "tef_kcal": 150, "tee_calc": 2200, "energy_balance": -702, "weight_am_7d": 69.92, "bodyfat_am_7d": 29.88, "muscle_mass_am_7d": 20.2, "steps_7d": 4565.67, "waist_am_7d": 88.8, "grip_mean_am_7d": 27.44, "grip_mean_pm_7d": 26.74, "sleep_h_7d": 7.19, "intake_kcal_7d": 1675.6, "protein_g_7d": 59.78, "weight_am_chg": 0.05, "waist_am_chg": 0.67, "muscle_mass_am_chg": -0.03, "grip_mean_am_chg": -0.39, "midsleep_sd_min": 10.4, "log_streak": 5, "ffm_am": 48.8, "whtr": 0.555, "grip_rel": 0.381, "deficit_pct": 31.9, "meal_to_bed_h": 6.4, "protein_meals_ok": 0, "protein_meals_n": 3, "fat_mass_am_7d": 20.9, "ffm_am_7d": 49.02, "height_cm": 161.1, "guide_sleep": "○", "guide_carb": "○", "guide_deficit": "×", "guide_steps": "○"}, {"date": "2026-09-25", "active_kcal": 459.0, "bedtime": 25.05, "brisk_steps": 6501.0, "calcium_mg": 454.0, "carb_g": 271.5, "fat_g": 67.7, "fiber_g": 17.6, "foodcat:ご飯もの": 538.0, "foodcat:パン・菓子": 259.0, "foodcat:プロテインバー": 188.0, "foodcat:肉・魚・乳製品": 70.0, "foodcat:飲料・汁物・その他": 24.0, "foodcat:麺類": 924.0, "grip_L_am": 27.6, "grip_L_pm": 37.3, "grip_R_am": 26.5, "grip_R_pm": 32.8, "intake_kcal": 2003.0, "iron_mg": 8.5, "mealkcal:夕食": 658.0, "mealkcal:昼食": 562.0, "mealkcal:朝食": 783.0, "mealprot:夕食": 31.7, "mealprot:昼食": 24.2, "mealprot:朝食": 28.7, "omron_total_kcal": 2306.0, "protein_g": 84.6, "salt_g": 16.1, "satfat_g": 14.55, "steps": 8006.0, "toggl:休憩": 1.617, "toggl:研究": 0.451, "toggl:雑務(音楽を聞きながらの作業)": 4.244, "vitA_ug": 174.0, "vitB1_mg": 0.76, "vitB2_mg": 1.36, "vitC_mg": 21.0, "vitE_mg": 6.4, "waist_am": 92.7, "waist_pm": 88.9, "wake_final": "06:51", "wake_first": "06:51", "bmi_am": 27.0, "bmr_am": 1566.0, "bodyfat_am": 30.0, "fat_mass_am": 21.0, "muscle_mass_am": 20.3, "muscle_pct_am": 28.9, "visceral_fat_am": 12.0, "weight_am": 70.1, "meal_breakfast": "08:09", "meal_lunch": "11:55", "meal_dinner": "17:28", "bmi_pm": 27.3, "bmr_pm": 1585.0, "bodyfat_pm": 27.9, "fat_mass_pm": 19.7, "muscle_mass_pm": 20.9, "muscle_pct_pm": 29.5, "visceral_fat_pm": 12.0, "weight_pm": 70.7, "sleep_h": 6.85, "wake_h": 6.85, "midsleep_h": 3.43, "first_meal_h": 8.15, "last_meal_h": 17.47, "meals_n": 3, "eating_window_h": 9.32, "grip_mean_am": 27.05, "grip_mean_pm": 35.05, "pfc_p_pct": 16.6, "pfc_f_pct": 30.0, "pfc_c_pct": 53.4, "protein_g_per_kg": 1.21, "bmr_used": 1566, "tef_kcal": 200, "tee_calc": 2225, "energy_balance": -222, "weight_am_7d": 69.95, "bodyfat_am_7d": 29.9, "muscle_mass_am_7d": 20.22, "steps_7d": 5425.75, "waist_am_7d": 89.45, "grip_mean_am_7d": 27.38, "grip_mean_pm_7d": 28.12, "sleep_h_7d": 7.12, "intake_kcal_7d": 1730.17, "protein_g_7d": 63.92, "weight_am_chg": 0.08, "waist_am_chg": 1.32, "muscle_mass_am_chg": -0.01, "grip_mean_am_chg": -0.45, "midsleep_sd_min": 11.2, "log_streak": 6, "ffm_am": 49.1, "whtr": 0.575, "grip_rel": 0.386, "deficit_pct": 10.0, "meal_to_bed_h": 7.58, "protein_meals_ok": 2, "protein_meals_n": 3, "fat_mass_am_7d": 20.92, "ffm_am_7d": 49.03, "height_cm": 161.1, "guide_sleep": "△", "guide_carb": "○", "guide_deficit": "○", "guide_steps": "○"}, {"date": "2026-09-26", "active_kcal": 264.0, "bedtime": 24.25, "brisk_steps": 3352.0, "calcium_mg": 439.0, "carb_g": 125.5, "fat_g": 47.4, "fiber_g": 27.3, "foodcat:プロテインバー": 348.0, "foodcat:飲料・汁物・その他": 0.0, "foodcat:麺類": 720.0, "grip_L_am": 31.2, "grip_L_pm": 28.2, "grip_R_am": 31.0, "grip_R_pm": 27.5, "intake_kcal": 1068.0, "iron_mg": 5.4, "mealkcal:夕食": 532.0, "mealkcal:昼食": 536.0, "mealprot:夕食": 28.8, "mealprot:昼食": 24.8, "morning_resleep_min": 182, "omron_total_kcal": 1965.0, "protein_g": 53.6, "salt_g": 12.6, "satfat_g": 19.36, "steps": 4431.0, "toggl:休憩": 2.514, "toggl:研究": 2.639, "toggl:雑務(音楽を聞きながらの作業)": 2.787, "vitA_ug": 10.0, "vitB1_mg": 0.55, "vitB2_mg": 0.57, "vitC_mg": 1.0, "vitE_mg": 6.4, "waist_am": 90.7, "waist_pm": 89.5, "wake_final": "09:40", "wake_first": "04:50", "bmi_am": 26.9, "bmr_am": 1566.0, "bodyfat_am": 29.0, "fat_mass_am": 20.2, "muscle_mass_am": 20.4, "muscle_pct_am": 29.2, "visceral_fat_am": 12.0, "weight_am": 69.8, "meal_lunch": "11:00", "meal_dinner": "17:26", "bmi_pm": 26.9, "bmr_pm": 1567.0, "bodyfat_pm": 28.6, "fat_mass_pm": 20.0, "muscle_mass_pm": 20.5, "muscle_pct_pm": 29.3, "visceral_fat_pm": 12.0, "weight_pm": 69.8, "sleep_h": 6.82, "wake_h": 9.67, "midsleep_h": 2.94, "first_meal_h": 11.0, "last_meal_h": 17.43, "meals_n": 2, "eating_window_h": 6.43, "grip_mean_am": 31.1, "grip_mean_pm": 27.85, "pfc_p_pct": 18.8, "pfc_f_pct": 37.3, "pfc_c_pct": 43.9, "protein_g_per_kg": 0.77, "bmr_used": 1566, "tef_kcal": 107, "tee_calc": 1937, "energy_balance": -869, "weight_am_7d": 69.93, "bodyfat_am_7d": 29.77, "muscle_mass_am_7d": 20.24, "steps_7d": 5226.8, "waist_am_7d": 89.63, "grip_mean_am_7d": 27.91, "grip_mean_pm_7d": 28.09, "sleep_h_7d": 7.07, "intake_kcal_7d": 1635.57, "protein_g_7d": 62.44, "weight_am_chg": 0.06, "waist_am_chg": 1.5, "muscle_mass_am_chg": 0.01, "grip_mean_am_chg": 0.08, "midsleep_sd_min": 19.7, "log_streak": 7, "ffm_am": 49.6, "whtr": 0.563, "grip_rel": 0.446, "deficit_pct": 44.9, "meal_to_bed_h": 6.82, "protein_meals_ok": 1, "protein_meals_n": 2, "weight_rate_pct_wk": 0.19, "fat_mass_am_7d": 20.81, "ffm_am_7d": 49.11, "height_cm": 161.1, "guide_sleep": "△", "guide_carb": "×", "guide_deficit": "×", "guide_steps": "○"}], "cog_ref": null, "notes": [], "toggl": [], "toggl_tasks": [], "foods": [{"date": "2026-09-20", "meal": "昼食", "time": "", "item": "反魂旦(1個17g)", "short": "反魂旦", "maker": "美都家", "kcal": 52.0, "category": "パン・菓子"}, {"date": "2026-09-20", "meal": "夕食", "time": "18:06", "item": "ニュータッチ 凄麺 和歌山中華そば(1食118g)", "short": "和歌山中華そば", "maker": "ヤマダイ", "kcal": 365.0, "category": "麺類"}, {"date": "2026-09-20", "meal": "夕食", "time": "18:06", "item": "1本満足バー プロテインホワイト(1本)", "short": "プロテインバー", "maker": "アサヒ", "kcal": 188.0, "category": "プロテインバー"}, {"date": "2026-09-20", "meal": "夕食", "time": "18:06", "item": "北海道牛乳 チョコクリームパン(1個)", "short": "チョコクリームパン", "maker": "KOUBO", "kcal": 265.0, "category": "パン・菓子"}, {"date": "2026-09-20", "meal": "間食", "time": "", "item": "ジョージアカフェラテ(1本500ml)", "short": "カフェラテ", "maker": "コカ・コーラ", "kcal": 145.0, "category": "飲料・汁物・その他"}, {"date": "2026-09-21", "meal": "朝食", "time": "", "item": "播州ラーメン甘口醤油味(1食123g)", "short": "播州ラーメン", "maker": "ヤマダイ", "kcal": 330.0, "category": "麺類"}, {"date": "2026-09-21", "meal": "朝食", "time": "", "item": "アップルパイ(1個)", "short": "アップルパイ", "maker": "KOUBO", "kcal": 258.0, "category": "パン・菓子"}, {"date": "2026-09-21", "meal": "朝食", "time": "", "item": "1本満足バー プロテインホワイト(1本)", "short": "プロテインバー", "maker": "アサヒ", "kcal": 188.0, "category": "プロテインバー"}, {"date": "2026-09-21", "meal": "昼食", "time": "", "item": "大きなおにぎり 鮭(1個)", "short": "鮭おにぎり", "maker": "ローソン", "kcal": 283.0, "category": "ご飯もの"}, {"date": "2026-09-21", "meal": "昼食", "time": "", "item": "手巻おにぎり 福井梅(紅映)(1個)", "short": "梅おにぎり", "maker": "ローソン", "kcal": 169.0, "category": "ご飯もの"}, {"date": "2026-09-21", "meal": "昼食", "time": "", "item": "meiji チョコクロワッサン チョコ入りホイップ(1個)", "short": "チョコクロワッサン", "maker": "ローソン", "kcal": 373.0, "category": "パン・菓子"}, {"date": "2026-09-21", "meal": "夕食", "time": "", "item": "北海道牛乳 チョコクリームパン(1個)", "short": "チョコクリームパン", "maker": "KOUBO", "kcal": 265.0, "category": "パン・菓子"}, {"date": "2026-09-21", "meal": "夕食", "time": "", "item": "1本満足バー プロテインホワイト(1本)", "short": "プロテインバー", "maker": "アサヒ", "kcal": 188.0, "category": "プロテインバー"}, {"date": "2026-09-21", "meal": "夕食", "time": "", "item": "凄麺 奈良天理スタミナラーメン(1人前112g)", "short": "天理スタミナラーメン", "maker": "ヤマダイ", "kcal": 307.0, "category": "麺類"}, {"date": "2026-09-21", "meal": "間食", "time": "", "item": "ワンダ ブラック モーニングアメリカーノ(1本500ml)", "short": "ブラックコーヒー", "maker": "アサヒ飲料", "kcal": 0.0, "category": "飲料・汁物・その他"}, {"date": "2026-09-22", "meal": "昼食", "time": "", "item": "北海道小豆あんぱん(1個)", "short": "あんぱん", "maker": "KOUBO", "kcal": 269.0, "category": "パン・菓子"}, {"date": "2026-09-22", "meal": "昼食", "time": "", "item": "凄麺 信州味噌ラーメン(1個121g)", "short": "信州味噌ラーメン", "maker": "ヤマダイ", "kcal": 412.0, "category": "麺類"}, {"date": "2026-09-22", "meal": "昼食", "time": "", "item": "1本満足バー プロテインホワイト(1本)", "short": "プロテインバー", "maker": "アサヒ", "kcal": 188.0, "category": "プロテインバー"}, {"date": "2026-09-22", "meal": "夕食", "time": "", "item": "1本満足バー プロテインホワイト(1本)", "short": "プロテインバー", "maker": "アサヒ", "kcal": 188.0, "category": "プロテインバー"}, {"date": "2026-09-22", "meal": "夕食", "time": "", "item": "アップルパイ(1個)", "short": "アップルパイ", "maker": "KOUBO", "kcal": 258.0, "category": "パン・菓子"}, {"date": "2026-09-22", "meal": "夕食", "time": "", "item": "凄麺 長崎ちゃんぽん(1個121g)", "short": "長崎ちゃんぽん", "maker": "ヤマダイ", "kcal": 382.0, "category": "麺類"}, {"date": "2026-09-22", "meal": "間食", "time": "", "item": "inゼリー マルチビタミン カロリーゼロ(1袋180g)", "short": "inゼリー", "maker": "森永製菓", "kcal": 0.0, "category": "飲料・汁物・その他"}, {"date": "2026-09-22", "meal": "間食", "time": "", "item": "やかんの濃い麦茶香ばしい(1本600ml)", "short": "麦茶", "maker": "コカ・コーラ", "kcal": 0.0, "category": "飲料・汁物・その他"}, {"date": "2026-09-23", "meal": "昼食", "time": "", "item": "プレミアムおにぎり 焼さけハラミ(1個)", "short": "焼さけハラミおにぎり", "maker": "ローソン", "kcal": 204.0, "category": "ご飯もの"}, {"date": "2026-09-23", "meal": "昼食", "time": "", "item": "チョコデニッシュちぎりパン(1個)", "short": "チョコデニッシュ", "maker": "ローソン", "kcal": 488.0, "category": "パン・菓子"}, {"date": "2026-09-23", "meal": "昼食", "time": "", "item": "具!おにぎり まるでまぐろたたき丼(とろたく風)(1個)", "short": "まぐろたたきおにぎり", "maker": "ローソン", "kcal": 262.0, "category": "ご飯もの"}, {"date": "2026-09-23", "meal": "昼食", "time": "", "item": "さけるチーズ スモーク味(1本25g)", "short": "さけるチーズ", "maker": "雪印メグミルク", "kcal": 80.0, "category": "肉・魚・乳製品"}, {"date": "2026-09-23", "meal": "夕食", "time": "", "item": "ガーリック香る直火焼ハラミ(1パック70g)", "short": "焼きハラミ", "maker": "ローソン", "kcal": 185.0, "category": "肉・魚・乳製品"}, {"date": "2026-09-23", "meal": "夕食", "time": "", "item": "贅沢すぎ!海鮮づくし上海風焼そば(1人前)", "short": "海鮮上海焼そば", "maker": "ローソン", "kcal": 588.0, "category": "麺類"}, {"date": "2026-09-24", "meal": "朝食", "time": "", "item": "1本満足バー プロテインブラック(1本39g)", "short": "プロテインバー", "maker": "アサヒ", "kcal": 174.0, "category": "プロテインバー"}, {"date": "2026-09-24", "meal": "朝食", "time": "", "item": "だしがきいてる うどんだっぺ(1人前80g)", "short": "うどん", "maker": "麺のスナオシ", "kcal": 358.0, "category": "麺類"}, {"date": "2026-09-24", "meal": "昼食", "time": "", "item": "海老天そば", "short": "海老天そば", "maker": "", "kcal": 429.0, "category": "麺類"}, {"date": "2026-09-24", "meal": "夕食", "time": "", "item": "1本満足バー プロテインブラック(1本39g)", "short": "プロテインバー", "maker": "アサヒ", "kcal": 174.0, "category": "プロテインバー"}, {"date": "2026-09-24", "meal": "夕食", "time": "", "item": "醤油ラーメン(1カップ)", "short": "カップ醤油ラーメン", "maker": "麺のスナオシ", "kcal": 363.0, "category": "麺類"}, {"date": "2026-09-24", "meal": "間食", "time": "", "item": "ワンダ ブラック モーニングアメリカーノ(1本500ml)", "short": "ブラックコーヒー", "maker": "アサヒ飲料", "kcal": 0.0, "category": "飲料・汁物・その他"}, {"date": "2026-09-25", "meal": "朝食", "time": "", "item": "スイートポテトパイ(1個)", "short": "スイートポテトパイ", "maker": "KOUBO", "kcal": 259.0, "category": "パン・菓子"}, {"date": "2026-09-25", "meal": "朝食", "time": "", "item": "1本満足バー プロテインホワイト(1本)", "short": "プロテインバー", "maker": "アサヒ", "kcal": 188.0, "category": "プロテインバー"}, {"date": "2026-09-25", "meal": "朝食", "time": "", "item": "麺職人 濃厚担々麺(1食96g)", "short": "担々麺", "maker": "日清食品", "kcal": 336.0, "category": "麺類"}, {"date": "2026-09-25", "meal": "昼食", "time": "", "item": "ねぎとろ丼(中)", "short": "ねぎとろ丼", "maker": "", "kcal": 538.0, "category": "ご飯もの"}, {"date": "2026-09-25", "meal": "昼食", "time": "", "item": "味噌汁", "short": "味噌汁", "maker": "", "kcal": 24.0, "category": "飲料・汁物・その他"}, {"date": "2026-09-25", "meal": "夕食", "time": "", "item": "スモークタン(1パック34g)", "short": "スモークタン", "maker": "ローソン", "kcal": 70.0, "category": "肉・魚・乳製品"}, {"date": "2026-09-25", "meal": "夕食", "time": "", "item": "贅沢すぎ!海鮮づくし上海風焼そば(1人前)", "short": "海鮮上海焼そば", "maker": "ローソン", "kcal": 588.0, "category": "麺類"}, {"date": "2026-09-25", "meal": "間食", "time": "", "item": "ワンダ ブラック モーニングアメリカーノ(1本500ml)", "short": "ブラックコーヒー", "maker": "アサヒ飲料", "kcal": 0.0, "category": "飲料・汁物・その他"}, {"date": "2026-09-26", "meal": "昼食", "time": "", "item": "やかんの濃い麦茶香ばしい(1本600ml)", "short": "麦茶", "maker": "コカ・コーラ", "kcal": 0.0, "category": "飲料・汁物・その他"}, {"date": "2026-09-26", "meal": "昼食", "time": "", "item": "ご当地シリーズ 札幌味噌ラーメン(1人前103g)", "short": "札幌味噌ラーメン", "maker": "麺のスナオシ", "kcal": 362.0, "category": "麺類"}, {"date": "2026-09-26", "meal": "昼食", "time": "", "item": "1本満足バー プロテインブラック(1本39g)", "short": "プロテインバー", "maker": "アサヒ", "kcal": 174.0, "category": "プロテインバー"}, {"date": "2026-09-26", "meal": "夕食", "time": "", "item": "1本満足バー プロテインブラック(1本39g)", "short": "プロテインバー", "maker": "アサヒ", "kcal": 174.0, "category": "プロテインバー"}, {"date": "2026-09-26", "meal": "夕食", "time": "", "item": "だしがきいてるそばだっぺ(1人前80g)", "short": "そば", "maker": "麺のスナオシ", "kcal": 358.0, "category": "麺類"}], "judg": [{"date": "2026-09-20", "エネルギー": "不足", "たんぱく質": "不足", "脂質": "不足", "炭水化物": "不足", "カルシウム": "不足", "鉄": "不足", "ビタミンA": "不足", "ビタミンE": "不足", "ビタミンB1": "不足", "ビタミンB2": "不足", "ビタミンC": "不足", "食物繊維": "不足", "飽和脂肪酸": "適正", "塩分": "過剰"}, {"date": "2026-09-21", "エネルギー": "過剰", "たんぱく質": "適正", "脂質": "過剰", "炭水化物": "適正", "カルシウム": "不足", "鉄": "適正", "ビタミンA": "不足", "ビタミンE": "適正", "ビタミンB1": "不足", "ビタミンB2": "不足", "ビタミンC": "不足", "食物繊維": "不足", "飽和脂肪酸": "過剰", "塩分": "過剰"}, {"date": "2026-09-22", "エネルギー": "不足", "たんぱく質": "不足", "脂質": "適正", "炭水化物": "不足", "カルシウム": "不足", "鉄": "適正", "ビタミンA": "適正", "ビタミンE": "適正", "ビタミンB1": "適正", "ビタミンB2": "適正", "ビタミンC": "適正", "食物繊維": "不足", "飽和脂肪酸": "適正", "塩分": "過剰"}, {"date": "2026-09-23", "エネルギー": "不足", "たんぱく質": "不足", "脂質": "過剰", "炭水化物": "不足", "カルシウム": "不足", "鉄": "不足", "ビタミンA": "不足", "ビタミンE": "適正", "ビタミンB1": "不足", "ビタミンB2": "不足", "ビタミンC": "不足", "食物繊維": "不足", "飽和脂肪酸": "過剰", "塩分": "過剰"}, {"date": "2026-09-24", "エネルギー": "不足", "たんぱく質": "不足", "脂質": "適正", "炭水化物": "不足", "カルシウム": "不足", "鉄": "不足", "ビタミンA": "不足", "ビタミンE": "不足", "ビタミンB1": "適正", "ビタミンB2": "不足", "ビタミンC": "不足", "食物繊維": "適正", "飽和脂肪酸": "過剰", "塩分": "過剰"}, {"date": "2026-09-25", "エネルギー": "適正", "たんぱく質": "適正", "脂質": "適正", "炭水化物": "適正", "カルシウム": "不足", "鉄": "適正", "ビタミンA": "不足", "ビタミンE": "不足", "ビタミンB1": "不足", "ビタミンB2": "不足", "ビタミンC": "不足", "食物繊維": "不足", "飽和脂肪酸": "適正", "塩分": "過剰"}, {"date": "2026-09-26", "エネルギー": "不足", "たんぱく質": "不足", "脂質": "適正", "炭水化物": "不足", "カルシウム": "不足", "鉄": "不足", "ビタミンA": "不足", "ビタミンE": "不足", "ビタミンB1": "不足", "ビタミンB2": "不足", "ビタミンC": "不足", "食物繊維": "適正", "飽和脂肪酸": "過剰", "塩分": "過剰"}], "show_diet": true, "show_time": true, "name": "S.W."};
+(function(){
+const D=DATA.daily, OWN=DATA.mode==="private", PRIVATE=OWN||!!DATA.full, XC=DATA.xcard||null;
+const put=(id,el)=>{if(!el)return;if(!DATA.only||DATA.only.includes(id)){el.id="sec-"+id;app.append(el)}};
+const $=(t,a={},...c)=>{const e=document.createElement(t);for(const k in a){k==="class"?e.className=a[k]:e.setAttribute(k,a[k])}c.flat().forEach(x=>e.append(x&&x.nodeType?x:document.createTextNode(x??"")));return e};
+const fmt=(v,d=1)=>v==null||v===""||isNaN(v)?"–":Number(v).toFixed(d);
+const hm=h=>{if(h==null||h==="")return"–";h=((h%24)+24)%24;const H=Math.floor(h),M=Math.round((h-H)*60);return String(H).padStart(2,"0")+":"+String(M===60?0:M).padStart(2,"0")};
+const md=s=>{const [y,m,d]=s.split("-");return (+m)+"/"+(+d)};
+const num=v=>v===""||v==null?null:+v;
+const has=k=>D.some(r=>num(r[k])!=null);
+const last=k=>{for(let i=D.length-1;i>=0;i--){const v=num(D[i][k]);if(v!=null)return v}return null};
+const mean=k=>{const v=D.slice(-7).map(r=>num(r[k])).filter(x=>x!=null);return v.length?v.reduce((a,b)=>a+b,0)/v.length:null};
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+function line(el,{series,fmtV=v=>fmt(v),yfmt,bars,h,refs=[],barColor}){
+  const W=Math.max(160,Math.round(el.clientWidth||320)),H=h||180,m={l:44,r:10,t:12,b:24},iw=W-m.l-m.r,ih=H-m.t-m.b;
+  const pts0=series.flatMap(s=>D.map(r=>num(r[s.key])).filter(v=>v!=null));
+  if(!pts0.length){el.append($("div",{class:"empty"},"まだ記録がありません"));return}
+  const pts=pts0.concat(refs.map(r=>r.v));
+  if(!pts.length){el.append($("div",{class:"empty"},"まだ記録がありません"));return}
+  let lo=Math.min(...pts),hi=Math.max(...pts);if(bars){lo=Math.min(0,lo);hi=Math.max(0,hi)}
+  if(lo===hi){lo-=1;hi+=1}const pad=(hi-lo)*.12;if(!bars||lo<0)lo-=pad;hi+=pad;
+  const step=(()=>{const r=(hi-lo)/4,p=Math.pow(10,Math.floor(Math.log10(r)));return [1,2,2.5,5,10].map(x=>x*p).find(x=>x>=r)})();
+  const t0=Math.ceil(lo/step)*step,ticks=[];for(let v=t0;v<=hi+1e-9;v+=step)ticks.push(+v.toFixed(6));
+  const n=D.length,x=i=>m.l+(n===1?iw/2:i*iw/(n-1)),y=v=>m.t+ih-(v-lo)/(hi-lo)*ih;
+  const NS="http://www.w3.org/2000/svg",s=document.createElementNS(NS,"svg");
+  s.setAttribute("viewBox",`0 0 ${W} ${H}`);s.setAttribute("role","img");
+  const g=(t,a)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);s.append(e);return e};
+  ticks.forEach(v=>{g("line",{x1:m.l,x2:W-m.r,y1:y(v),y2:y(v),stroke:css("--grid"),"stroke-width":1});const t=g("text",{x:m.l-6,y:y(v)+3,"text-anchor":"end"});const dec=Math.max(0,-Math.floor(Math.log10(step)+1e-9));t.textContent=yfmt?yfmt(v,dec):fmt(v,dec)});
+  const every=Math.max(1,Math.ceil(n/7));
+  D.forEach((r,i)=>{if((i%every===0&&(n-1-i>=every||i===n-1))||i===n-1){const t=g("text",{x:x(i),y:H-6,"text-anchor":"middle"});t.textContent=md(r.date)}});
+  series.forEach(se=>{
+    const col=css(se.color);
+    if(se.bar){const bw=Math.max(4,Math.min(18,iw/n*.6));D.forEach((r,i)=>{const v=num(r[se.key]);if(v==null)return;const col=barColor?css(barColor(v)):css(se.color);const z=y(Math.max(lo,0)),yy=y(v);if(v<0){g("rect",{x:x(i)-bw/2,y:z,width:bw,height:Math.max(1,yy-z),fill:col,opacity:.85});return}const h=Math.max(1,z-yy);g("path",{d:`M${x(i)-bw/2},${z}V${yy+Math.min(4,h)}q0,-${Math.min(4,h)} ${Math.min(4,bw/2)},-${Math.min(4,h)}H${x(i)+bw/2-Math.min(4,bw/2)}q${Math.min(4,bw/2)},0 ${Math.min(4,bw/2)},${Math.min(4,h)}V${z}Z`,fill:col,opacity:.85})});return}
+    let d="",pen=false;D.forEach((r,i)=>{const v=num(r[se.key]);if(v==null){pen=false;return}d+=(pen?"L":"M")+x(i)+","+y(v);pen=true});
+    g("path",{d,fill:"none",stroke:col,"stroke-width":2,"stroke-linejoin":"round","stroke-dasharray":se.dash||""});
+    if(!se.dash)D.forEach((r,i)=>{const v=num(r[se.key]);if(v!=null)g("circle",{cx:x(i),cy:y(v),r:3.5,fill:col,stroke:css("--surface"),"stroke-width":2})});
+  });
+  refs.forEach(rf=>{const yy=y(rf.v);g("line",{x1:m.l,x2:W-m.r,y1:yy,y2:yy,stroke:css(rf.color||"--ref"),"stroke-width":1.5,"stroke-dasharray":"6 4"});
+    const t=g("text",{x:W-m.r-2,y:yy-4,"text-anchor":"end",class:"reflab"});t.textContent=rf.label});
+  const cross=g("line",{y1:m.t,y2:m.t+ih,stroke:css("--muted"),"stroke-width":1,opacity:0});
+  const hit=g("rect",{x:m.l,y:0,width:iw,height:H,fill:"transparent"});
+  el.append(s);const tip=$("div",{class:"tip",hidden:""});el.append(tip);
+  const move=ev=>{const b=s.getBoundingClientRect(),px=(ev.clientX-b.left)/b.width*W;const i=Math.max(0,Math.min(n-1,Math.round((px-m.l)/(iw/(Math.max(1,n-1))))));
+    cross.setAttribute("x1",x(i));cross.setAttribute("x2",x(i));cross.setAttribute("opacity",.5);
+    tip.replaceChildren($("div",{},md(D[i].date)),...series.map(se=>$("div",{},se.label+"  ",$("span",{class:"num"},num(D[i][se.key])==null?"–":fmtV(num(D[i][se.key]))))));
+    tip.hidden=false;tip.style.left=(x(i)/W*100)+"%";tip.style.top=(m.t/H*b.height)+"px"};
+  hit.addEventListener("pointermove",move);hit.addEventListener("pointerleave",()=>{tip.hidden=true;cross.setAttribute("opacity",0)});
+}
+function stacked(el,{series,unit="",dec=0,max}){
+  const W=Math.max(220,Math.round(el.clientWidth||320)),H=190,m={l:44,r:10,t:12,b:24},iw=W-m.l-m.r,ih=H-m.t-m.b;
+  const tot=D.map(r=>series.reduce((a,s)=>a+(num(r[s.key])||0),0));
+  if(!tot.some(v=>v>0)){el.append($("div",{class:"empty"},"まだ記録がありません"));return}
+  let hi=max||Math.max(...tot)*1.08;const step=(()=>{const r=hi/4,p=Math.pow(10,Math.floor(Math.log10(r)));return [1,2,2.5,5,10].map(x=>x*p).find(x=>x>=r)})();if(!max)hi=Math.ceil(hi/step)*step;
+  const n=D.length,bw=Math.max(6,Math.min(26,iw/n*.62)),x=i=>m.l+(i+.5)*iw/n,y=v=>m.t+ih-v/hi*ih;
+  const NS="http://www.w3.org/2000/svg",s=document.createElementNS(NS,"svg");s.setAttribute("viewBox",`0 0 ${W} ${H}`);s.setAttribute("role","img");
+  const g=(t,a)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);s.append(e);return e};
+  const d0=Math.max(0,-Math.floor(Math.log10(step)+1e-9));
+  for(let v=0;v<=hi+1e-9;v+=step){g("line",{x1:m.l,x2:W-m.r,y1:y(v),y2:y(v),stroke:css("--grid"),"stroke-width":1});const t=g("text",{x:m.l-6,y:y(v)+3,"text-anchor":"end"});t.textContent=v>=1000?fmt(v/1000,1)+"k":fmt(v,d0)}
+  const every=Math.max(1,Math.ceil(n/7));D.forEach((r,i)=>{if((i%every===0&&(n-1-i>=every||i===n-1))||i===n-1){const t=g("text",{x:x(i),y:H-6,"text-anchor":"middle"});t.textContent=md(r.date)}});
+  D.forEach((r,i)=>{let acc=0;const segs=series.map(se=>({se,v:num(r[se.key])||0})).filter(o=>o.v>0);
+    segs.forEach((o,j)=>{const y0=y(acc),y1=y(acc+o.v);acc+=o.v;const top=j===segs.length-1,hgt=Math.max(0,y0-y1-(top?0:2)),rr=top?Math.min(4,hgt,bw/2):0,x0=x(i)-bw/2,yt=y0-hgt;
+      g("path",{d:`M${x0},${y0}V${yt+rr}q0,-${rr} ${rr},-${rr}H${x0+bw-rr}q${rr},0 ${rr},${rr}V${y0}Z`,fill:css(o.se.color)})})});
+  const cross=g("rect",{y:m.t,height:ih,width:iw/n,fill:css("--muted"),opacity:0});
+  const hit=g("rect",{x:m.l,y:0,width:iw,height:H,fill:"transparent"});el.append(s);const tip=$("div",{class:"tip",hidden:""});el.append(tip);
+  hit.addEventListener("pointermove",ev=>{const b=s.getBoundingClientRect(),px=(ev.clientX-b.left)/b.width*W,i=Math.max(0,Math.min(n-1,Math.floor((px-m.l)/(iw/n))));
+    cross.setAttribute("x",m.l+i*iw/n);cross.setAttribute("opacity",.08);
+    tip.replaceChildren($("div",{},md(D[i].date)+"  計 ",$("span",{class:"num"},fmt(tot[i],dec)+unit)),...series.filter(se=>num(D[i][se.key])).map(se=>$("div",{},$("i",{class:"sw",style:`background:var(${se.color})`}),se.label+"  ",$("span",{class:"num"},fmt(num(D[i][se.key]),dec)+unit))));
+    tip.hidden=false;tip.style.left=(x(i)/W*100)+"%";tip.style.top=(m.t/H*b.height)+"px"});
+  hit.addEventListener("pointerleave",()=>{tip.hidden=true;cross.setAttribute("opacity",0)});
+}
+function scard(title,sub,series,opt={}){
+  if(!series.length||(XC&&!series.some(s=>has(s.key))))return null;
+  const c=$("div",{class:"card"},$("h3",{},title));if(sub)c.append($("p",{class:"sub"},sub));
+  c.append($("div",{class:"legend"},series.map(s=>$("span",{},$("i",{class:"sq",style:`background:var(${s.color})`}),s.label))));
+  const ch=$("div",{class:"chart"});c.append(ch);requestAnimationFrame(()=>stacked(ch,{series,...opt}));return c}
+function card(title,sub,series,opt={}){
+  if(XC&&!series.some(s=>has(s.key)))return null;
+  if(series.some(s=>has(s.key)))series=series.filter(s=>has(s.key));
+  const c=$("div",{class:"card"},$("h3",{},title));if(sub)c.append($("p",{class:"sub"},sub));
+  if(series.length>1)c.append($("div",{class:"legend"},series.map(s=>$("span",{},$("i",{style:`background:var(${s.color})`+(s.dash?";opacity:.6":"")}),s.label))));
+  const ch=$("div",{class:"chart"});c.append(ch);requestAnimationFrame(()=>line(ch,{series,...opt}));return c}
+function section(title,note,cards){const g=$("div",{class:"grid"},cards.filter(Boolean));return $("section",{},$("h2",{},title,note?$("small",{},note):""),g)}
+function tile(k,v,s){return $("div",{class:"tile"},$("span",{class:"k"},k),$("span",{class:"v num"},v),$("span",{class:"s"},s||""))}
+const sign=v=>v==null?"–":(v>0?"+":"")+fmt(v,1);
+
+const app=document.getElementById("app");if(XC)document.documentElement.classList.add("x");
+const first=D.length?md(D[0].date):"",lastD=D.length?md(D[D.length-1].date):"";
+put("header",$("header",{},
+  $("h1",{},XC?`からだログ ${XC.n}/${XC.total}　${XC.title}`:"からだログ"),
+  $("div",{class:"meta"},$("span",{},`${first} 〜 ${lastD}`),$("span",{},"更新 "+DATA.generated),
+    $("span",{class:"pill"},OWN?"自分用":"共有用"))));
+
+const tiles=[];
+if(has("weight_am_chg"))tiles.push(tile("体重の変化（7日平均）",sign(last("weight_am_chg"))+" kg","開始時の7日平均との差"));
+if(PRIVATE&&has("weight_am"))tiles.push(tile("朝の体重（7日平均）",fmt(last("weight_am_7d"),1)+" kg","起床後の測定のみ"));
+if(has("waist_am_chg"))tiles.push(tile("腹囲の変化",sign(last("waist_am_chg"))+" cm","朝の測定・7日平均"));
+if(has("steps"))tiles.push(tile("歩数（直近7日平均）",fmt(mean("steps"),0),"歩/日"));
+if(has("sleep_h"))tiles.push(tile("睡眠時間（直近7日平均）",fmt(mean("sleep_h"),1)+" h","自己申告"));
+if(has("midsleep_sd_min"))tiles.push(tile("睡眠のばらつき",fmt(last("midsleep_sd_min"),0)+" 分","中央時刻の標準偏差・小さいほど規則的"));
+if(PRIVATE&&has("protein_g_per_kg"))tiles.push(tile("たんぱく質（直近7日平均）",fmt(mean("protein_g_per_kg"),2)+" g/kg","朝の体重あたり"));
+if(has("log_streak"))tiles.push(tile("記録の連続日数",fmt(last("log_streak"),0)+" 日",""));
+put("tiles",$("div",{class:"tiles"},tiles));
+
+// からだ
+put("body",section("からだ","朝（起床後・朝食前）と夜で値が系統的に違うため分けて表示",[
+  PRIVATE&&card("体重","点は日々の値，破線は7日平均",[{key:"weight_am",label:"朝",color:"--s1"},{key:"weight_pm",label:"夜",color:"--s2"},{key:"weight_am_7d",label:"朝の7日平均",color:"--s1",dash:"5 4"}],{fmtV:v=>fmt(v,1)+" kg"}),
+  !PRIVATE&&card("体重の変化","開始時の7日平均を0としたときの差（kg）",[{key:"weight_am_chg",label:"変化",color:"--s1"}],{fmtV:v=>sign(v)+" kg"}),
+  PRIVATE&&card("体脂肪率","体組成計（BIA）．夜は低く出やすい",[{key:"bodyfat_am",label:"朝",color:"--s1"},{key:"bodyfat_pm",label:"夜",color:"--s2"}],{fmtV:v=>fmt(v,1)+" %"}),
+  PRIVATE&&card("骨格筋量","体組成計の推定値",[{key:"muscle_mass_am",label:"朝",color:"--s1"},{key:"muscle_mass_pm",label:"夜",color:"--s2"}],{fmtV:v=>fmt(v,1)+" kg"}),
+  PRIVATE&&card("腹囲","へその高さ・インチ入力をcmに換算",[{key:"waist_am",label:"朝",color:"--s1"},{key:"waist_pm",label:"夜",color:"--s2"}],{fmtV:v=>fmt(v,1)+" cm"}),
+  !PRIVATE&&card("腹囲の変化","開始時の7日平均を0としたときの差（cm）",[{key:"waist_am_chg",label:"変化",color:"--s1"}],{fmtV:v=>sign(v)+" cm"}),
+  PRIVATE&&card("握力（左右平均）","朝と夜．夜のほうが高く出やすい",[{key:"grip_mean_am",label:"朝",color:"--s1"},{key:"grip_mean_pm",label:"夜",color:"--s2"}],{fmtV:v=>fmt(v,1)+" kg"}),
+  !PRIVATE&&card("握力（朝・7日平均）","左右平均",[{key:"grip_mean_am_7d",label:"朝",color:"--s1"}],{fmtV:v=>fmt(v,1)+" kg"}),
+]));
+// 認知機能を守る目安
+{
+  const G=[["guide_sleep","睡眠 7時間以上"],["guide_carb","炭水化物 130 g以上"],["guide_deficit","不足率 25%以内"],["guide_steps","歩数 3,800以上（9,800で◎）"],["guide_kss","眠気 KSS 7未満"],["guide_cog","認知課題 基準内"]];
+  const rows=G.filter(([k])=>D.some(r=>r[k]));
+  if(rows.length){
+    const days=D.filter(r=>rows.some(([k])=>r[k]));
+    const cls={"◎":"gok","○":"gok","△":"gmid","×":"gng"};
+    const tb=$("table",{class:"heat"},$("thead",{},$("tr",{},$("th",{},"目安"),days.map(r=>$("th",{},md(r.date))))),
+      $("tbody",{},rows.map(([k,l])=>$("tr",{},$("th",{},l),days.map(r=>$("td",{class:cls[r[k]]||"gna"},r[k]||"–"))))));
+    const ok=days.map(r=>rows.filter(([k])=>["◎","○"].includes(r[k])).length+"/"+rows.filter(([k])=>r[k]).length);
+    tb.querySelector("tbody").append($("tr",{},$("th",{},"達成数"),ok.map(v=>$("td",{class:"gna num"},v))));
+    put("guide",$("section",{},$("h2",{},"認知機能を守る目安",$("small",{},"◎○＝達成，△＝もう少し，×＝未達")),
+      $("div",{class:"card"},$("div",{class:"tbl"},tb),$("div",{class:"guide-note"},
+        $("span",{},"睡眠：7時間以上が推奨．6時間が2週間続くと注意課題の成績が徹夜1〜2日分まで低下"),
+        $("span",{},"炭水化物：脳が主に使うブドウ糖をまかなう最低量が130 g/日"),
+        $("span",{},"不足率：2年間の制限研究（目標25%，実際は約12%）で作業記憶の低下なし"),
+        $("span",{},"歩数：約3,800歩で認知症リスク25%低下，約9,800歩で最も低い"),
+        $("span",{},"眠気：KSS 7以上で作業成績が落ちやすい")))));
+  }
+}
+// ダイエットの指標
+put("indicators",section("ダイエットの指標","体組成計・歩数計・UpNote・あすけんから計算",[
+  card("体重の変化速度","朝の体重7日平均の傾き（%/週）．点線の間が筋肉を保ちやすい速さ",[{key:"weight_rate_pct_wk",label:"%/週",color:"--s1"}],{fmtV:v=>sign(v)+" %/週",refs:[{v:-0.5,label:"−0.5%"},{v:-1.0,label:"−1.0%"}]}),
+  card("エネルギー不足率","不足 ÷ 消費（計算）．緑＝25%以内，橙＝25%超",[{key:"deficit_pct",label:"不足率",color:"--in",bar:true}],{bars:true,fmtV:v=>fmt(v,1)+" %",refs:[{v:25,label:"25% CALERIEの目標"}],barColor:v=>v<=25?"--in":"--out"}),
+  card("脂肪量","体組成計・朝．破線は7日平均",[{key:"fat_mass_am",label:"脂肪量",color:"--s2"},{key:"fat_mass_am_7d",label:"7日平均",color:"--s2",dash:"5 4"}],{fmtV:v=>fmt(v,1)+" kg"}),
+  card("除脂肪量","体重 − 脂肪量．減らしたくない方",[{key:"ffm_am",label:"除脂肪量",color:"--s1"},{key:"ffm_am_7d",label:"7日平均",color:"--s1",dash:"5 4"}],{fmtV:v=>fmt(v,1)+" kg"}),
+  card("腹囲身長比","腹囲 ÷ 身長．目安は0.5未満",[{key:"whtr",label:"腹囲身長比",color:"--s1"}],{fmtV:v=>fmt(v,3),refs:[{v:0.5,label:"0.5"}]}),
+  card("体重あたり握力","朝の握力（左右平均）÷ 体重",[{key:"grip_rel",label:"握力/体重",color:"--s1"}],{fmtV:v=>fmt(v,3)}),
+  card("たんぱく質が足りた食事","体重1 kgあたり0.4 g以上の食事の数（間食を除く）",[{key:"protein_meals_ok",label:"食事数",color:"--s1",bar:true},{key:"protein_meals_n",label:"記録した食事数",color:"--s2"}],{bars:true,fmtV:v=>fmt(v,0)+" 食"}),
+  card("最後の食事から就寝まで","就寝時刻 − 最後の食事の時刻",[{key:"meal_to_bed_h",label:"時間",color:"--in",bar:true}],{bars:true,fmtV:v=>fmt(v,1)+" h",refs:[{v:3,label:"3時間"}],barColor:v=>v>=3?"--in":"--out"}),
+  card("筋トレのセット数","直近7日の合計",[{key:"sets_7d",label:"セット",color:"--s3",bar:true}],{bars:true,fmtV:v=>fmt(v,0)+" セット"}),
+]));
+// 活動・運動
+put("activity",section("活動と運動","消費カロリーは推定値",[
+  card("消費カロリー","計算値と歩数計の表示の比較",[{key:"tee_calc",label:"計算",color:"--s1"},{key:"omron_total_kcal",label:"歩数計の表示",color:"--s2"},{key:"tee_balance",label:"体重変化から逆算（14日）",color:"--s3"}],{fmtV:v=>fmt(v,0)+" kcal"}),
+  scard("消費カロリーの内訳","基礎代謝＋歩数計の活動＋筋トレ・運動（MET法）＋食事の熱産生",[{key:"bmr_used",label:"基礎代謝",color:"--c1"},{key:"active_kcal",label:"歩数計の活動",color:"--c2"},{key:"exercise_kcal",label:"筋トレ・運動",color:"--c3"},{key:"tef_kcal",label:"食事の熱産生",color:"--c4"}].filter(s=>has(s.key)),{unit:" kcal"}),
+  card("エネルギー収支","摂取 − 消費（計算）．マイナスが不足",[{key:"energy_balance",label:"収支",color:"--s1",bar:true}],{bars:true,fmtV:v=>(v>0?"+":"")+fmt(v,0)+" kcal"}),
+  card("歩数","棒は日々の値，線は7日平均．点線は認知症リスクとの関連から見た目安",[{key:"steps",label:"歩数",color:"--s1",bar:true},{key:"steps_7d",label:"7日平均",color:"--s2"}],{bars:true,fmtV:v=>fmt(v,0)+" 歩",yfmt:v=>v>=1000?fmt(v/1000,0)+"k":fmt(v,0),refs:[{v:9800,label:"9,800 最もリスクが低い"},{v:3800,label:"3,800 最低限",color:"--out"}]}),
+  card("筋トレの総負荷量","重量×回数の合計",[{key:"training_volume",label:"総負荷量",color:"--s3",bar:true}],{bars:true,fmtV:v=>fmt(v,0)+" kg"}),
+]));
+// 睡眠
+put("sleep",section("睡眠","UpNoteの起床・就寝時刻から計算（二度寝を含む）",[
+  card("睡眠時間","前夜の就寝から起床まで．点線は認知機能を保つ目安",[{key:"sleep_h",label:"睡眠時間",color:"--s1"}],{fmtV:v=>fmt(v,1)+" h",refs:[{v:7,label:"7h 推奨の下限"},{v:6,label:"6h 続くと認知成績が低下",color:"--out"}]}),
+  PRIVATE&&card("起床時刻と中央時刻","",[{key:"wake_h",label:"最終起床",color:"--s1"},{key:"midsleep_h",label:"睡眠の中央時刻",color:"--s2"}],{fmtV:hm,yfmt:hm}),
+  card("睡眠のばらつき","直近7日の中央時刻の標準偏差（分）",[{key:"midsleep_sd_min",label:"ばらつき",color:"--s1"}],{fmtV:v=>fmt(v,0)+" 分"}),
+]));
+if(DATA.show_diet){
+  const catsOrder=["麺類","パン・菓子","プロテインバー","ご飯もの","肉・魚・乳製品","飲料・汁物・その他"];
+  const cats=catsOrder.filter(c=>has("foodcat:"+c)).map((c,i)=>({key:"foodcat:"+c,label:c,color:"--c"+(catsOrder.indexOf(c)+1)}));
+  const meals=["朝食","昼食","夕食","間食"].map((m,i)=>({key:"mealkcal:"+m,label:m,color:"--c"+(i+1)})).filter(s=>has(s.key));
+  put("diet",section("食事","あすけんの画像から書き起こし",[
+    scard("摂取エネルギー（食事別）","棒の高さが1日の合計",meals,{unit:" kcal"}),
+    card("摂取と消費","消費は基礎代謝＋活動カロリー＋食事の熱産生",[{key:"intake_kcal",label:"摂取",color:"--s1"},{key:"tee_calc",label:"消費（計算）",color:"--s2"},{key:"intake_kcal_7d",label:"摂取の7日平均",color:"--s1",dash:"5 4"}],{fmtV:v=>fmt(v,0)+" kcal"}),
+    scard("何から摂ったか（食品の種類別）","食品名から分類したエネルギーの内訳",cats,{unit:" kcal"}),
+    scard("PFCバランス","エネルギー比（%）．目安はP13–20・F20–30・C50–65",[{key:"pfc_p_pct",label:"たんぱく質",color:"--c1"},{key:"pfc_f_pct",label:"脂質",color:"--c2"},{key:"pfc_c_pct",label:"炭水化物",color:"--c3"}],{unit:" %",dec:1,max:100}),
+    !XC&&card("たんぱく質","g/日",[{key:"protein_g",label:"g/日",color:"--s1"}],{fmtV:v=>fmt(v,1)+" g"}),
+    PRIVATE&&card("たんぱく質（体重あたり）","朝の体重で割った値．点線は筋肉を保つ目安",[{key:"protein_g_per_kg",label:"g/kg",color:"--s1"}],{fmtV:v=>fmt(v,2)+" g/kg",refs:[{v:1.6,label:"1.6 g/kg"}]}),
+    card("炭水化物","g/日．点線は脳のエネルギー源として必要な最低量",[{key:"carb_g",label:"炭水化物",color:"--s1",bar:true}],{bars:true,fmtV:v=>fmt(v,0)+" g",refs:[{v:130,label:"130 g"}],barColor:v=>v>=130?"--in":"--out"}),
+    card("食事の時間帯","最初と最後の食事の時刻（UpNote）",[{key:"first_meal_h",label:"最初",color:"--s1"},{key:"last_meal_h",label:"最後",color:"--s2"}],{fmtV:hm,yfmt:hm}),
+    card("摂食時間の幅","最初の食事から最後の食事まで．緑＝8時間以内，橙＝8時間超",[{key:"eating_window_h",label:"幅",color:"--in",bar:true}],{bars:true,fmtV:v=>fmt(v,1)+" h"+(v<=8?"（8h以内）":"（8h超）"),refs:[{v:8,label:"8時間"}],barColor:v=>v<=8?"--in":"--out"}),
+  ]));
+  const micro=[["fiber_g","食物繊維","g",1],["salt_g","塩分","g",1],["satfat_g","飽和脂肪酸","g",1],["calcium_mg","カルシウム","mg",0],["iron_mg","鉄","mg",1],["vitA_ug","ビタミンA","µg",0],["vitE_mg","ビタミンE","mg",1],["vitB1_mg","ビタミンB1","mg",2],["vitB2_mg","ビタミンB2","mg",2],["vitC_mg","ビタミンC","mg",0]];
+  const ms=section("栄養素","1日の合計．下の表はあすけんの判定",micro.filter(m=>has(m[0])).map(([k,l,u,d])=>card(l,u+"/日",[{key:k,label:l,color:"--s1"}],{fmtV:v=>fmt(v,d)+" "+u,h:130})));
+  ms.querySelector(".grid").classList.add("dense");put("nutrients",ms);
+  if(DATA.judg&&DATA.judg.length){
+    const nk=Object.keys(DATA.judg[0]).filter(k=>k!=="date");
+    const cls={"不足":"lo","適正":"ok","過剰":"hi"};
+    const tb=$("table",{class:"heat"},$("thead",{},$("tr",{},$("th",{},"栄養素"),DATA.judg.map(r=>$("th",{},md(r.date))))),
+      $("tbody",{},nk.map(k=>$("tr",{},$("th",{},k),DATA.judg.map(r=>$("td",{class:cls[r[k]]||""},r[k]||"–"))))));
+    put("judg",$("section",{},$("h2",{},"あすけんの判定",$("small",{},"青＝不足，灰＝適正，赤＝過剰（あすけんの1日の基準）")),$("div",{class:"card"},$("div",{class:"tbl"},tb))));
+  }
+  if(DATA.foods&&DATA.foods.length){
+    const byD={};DATA.foods.forEach(f=>(byD[f.date]=byD[f.date]||[]).push(f));
+    const days=Object.keys(byD).sort().reverse();
+    put("foods",$("section",{},$("h2",{},"食べたもの",$("small",{},"新しい日から")),$("div",{class:"notes"},days.map((d,i)=>{
+      const fs=byD[d],tot=fs.reduce((a,f)=>a+(f.kcal||0),0);
+      const ml=["朝食","昼食","夕食","間食"].filter(m=>fs.some(f=>f.meal===m));
+      const mealEl=m=>{
+        const mf=fs.filter(f=>f.meal===m),t=(mf.find(f=>f.time)||{}).time,sub=mf.reduce((a,f)=>a+(f.kcal||0),0);
+        const items=mf.map(f=>$("li",{},
+          $("span",{class:"chip",style:`--cc:var(--c${catsOrder.indexOf(f.category)+1})`},f.category),
+          $("span",{class:"it"},f.item+(f.maker?"（"+f.maker+"）":"")),
+          $("span",{class:"num"},fmt(f.kcal,0))));
+        return $("div",{class:"meal"},$("div",{class:"mh"},$("span",{},m+(t?" "+t:"")),$("span",{class:"num"},fmt(sub,0)+" kcal")),$("ul",{},items));
+      };
+      const det=$("details",{},
+        $("summary",{},$("b",{class:"num"},md(d)),$("span",{class:"num"},fmt(tot,0)+" kcal"),"・"+fs.filter(f=>f.kcal>0).length+"品"),
+        $("div",{class:"meals"},ml.map(mealEl)));
+      if(i===0)det.open=true;
+      return det;
+    }))));
+  }
+}
+// こころと脳
+const mind=[card("瞑想","分/日",[{key:"meditation_min",label:"瞑想",color:"--s3",bar:true}],{bars:true,fmtV:v=>fmt(v,0)+" 分"})];
+if(PRIVATE){
+  mind.push(card("朝の認知課題","正答試行の反応時間の中央値．点線は自分の基準（慣らし期間後の平均＋1SD）",[{key:"cog_rt_median",label:"RT",color:"--s1"}],{fmtV:v=>fmt(v,0)+" ms",refs:DATA.cog_ref?[{v:DATA.cog_ref,label:"基準＋1SD"}]:[]}));
+  mind.push(card("EEG（安静時）","相対パワー（Muse）",[{key:"eeg_alpha_rel",label:"α",color:"--s1"},{key:"eeg_theta_rel",label:"θ",color:"--s2"}],{fmtV:v=>fmt(v*100,1)+" %",yfmt:(v,d)=>fmt(v*100,Math.max(0,d-2))+"%"}));
+  mind.push(card("主観評価","眠気（KSS 1–9）．7以上は作業成績が落ちやすい",[{key:"kss",label:"眠気",color:"--s1"}],{fmtV:v=>fmt(v,0),refs:[{v:7,label:"7"}]}));
+}
+put("mind",section("こころと脳","",mind));
+
+if(DATA.show_time&&Object.keys(D.reduce((o,r)=>Object.assign(o,r),{})).some(k=>k.startsWith("toggl:"))){
+  const projs=[...new Set(D.flatMap(r=>Object.keys(r)).filter(k=>k.startsWith("toggl:")).map(k=>k.slice(6)))];
+  const order=["研究",...projs.filter(p=>p!=="研究"&&p!=="休憩"),"休憩"].filter(p=>projs.includes(p));
+  let c=null;
+  if(DATA.toggl_tasks&&DATA.toggl_tasks.length){
+    const agg={};DATA.toggl_tasks.forEach(t=>{agg[t.task]=agg[t.task]||{h:0,p:t.project};agg[t.task].h+=t.hours});
+    const rows=Object.entries(agg).sort((a,b)=>b[1].h-a[1].h).slice(0,12),mx=rows[0][1].h;
+    c=$("div",{class:"card"},$("h3",{},"タスク別の合計（上位12）"),$("p",{class:"sub"},"Toggl・期間内の合計"),
+      $("div",{class:"bars"},rows.map(([k,v])=>$("div",{class:"bar"},$("span",{},k),$("span",{class:"b",style:`width:${v.h/mx*100}%;background:var(--c${order.indexOf(v.p)+1})`}),$("span",{class:"num"},fmt(v.h,1)+" h")))));
+  }
+  put("time",section("時間の使い方","Togglの日別サマリー",[scard("プロジェクト別の時間","1日の記録時間の内訳",order.map((p,i)=>({key:"toggl:"+p,label:p,color:"--c"+(i+1)})),{unit:" h",dec:1}),c]));
+}
+if(PRIVATE&&DATA.notes&&DATA.notes.length){
+  put("notes",$("section",{},$("h2",{},"メモ・感想"),$("div",{class:"notes"},DATA.notes.slice().reverse().map(n=>$("div",{class:"note"},$("b",{},md(n.date)),n.text)))));
+}
+// 表
+const keys=[...new Set(D.flatMap(r=>Object.keys(r)))].filter(k=>k!=="date"&&!k.startsWith("toggl:")&&D.some(r=>r[k]!==""&&r[k]!=null));
+if(OWN)put("table",$("details",{},$("summary",{},"表で見る（全"+keys.length+"列）"),$("div",{class:"tbl"},$("table",{},$("thead",{},$("tr",{},$("th",{},"日付"),keys.map(k=>$("th",{},k)))),$("tbody",{},D.map(r=>$("tr",{},$("td",{},r.date),keys.map(k=>$("td",{class:"num"},r[k]??"")))))))));
+put("foot",$("p",{class:"foot"},OWN?"自分用．元データはPCのフォルダにあり，このページは scripts/build.py が生成．":"消費カロリーは推定値です．体の画像は含みません．"));
+})();
+</script>
+</body>
+</html>
